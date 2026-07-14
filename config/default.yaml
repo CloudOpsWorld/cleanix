@@ -1,0 +1,73 @@
+# Cleanix configuration — copy to ~/.config/cleanix/config.yaml and edit.
+# Every field is optional; omitted fields keep their built-in default.
+
+# Cleaners to disable entirely, by id (see `cleanix list`).
+disabled_cleaners: []
+#  - browsers
+#  - journal
+
+# Temp files must be older than this many days to be considered junk.
+temp_min_age_days: 3
+
+# Rotated logs (*.gz, *.old, *.1 ...) must be older than this to be removed.
+log_min_age_days: 7
+
+# Cap journald history to this size when vacuuming (MiB).
+journal_max_size_mb: 200
+
+# Coredumps older than this many days are considered junk.
+coredump_min_age_days: 3
+
+# Additional cache directories to clear (absolute paths, ~ allowed).
+extra_cache_dirs: []
+#  - ~/.cache/my-app
+
+# Browser cache profiles to include.
+browsers:
+  - firefox
+  - chrome
+  - chromium
+
+# Directories scanned for dangling (broken) symlinks left by removed software.
+symlink_scan_dirs:
+  - ~/.local/bin
+  - ~/bin
+  - ~/.local/share/applications
+  - /usr/local/bin
+  - /usr/local/sbin
+  - /usr/local/share/applications
+
+# When pruning Docker/Podman, also remove unused volumes (can hold real data).
+docker_prune_volumes: false
+
+# Offer removal of package-update residue (.rpmnew/.pacnew/.dpkg-old ...).
+remove_config_leftovers: true
+
+# Remove .DS_Store / AppleDouble (._*) litter from the home tree.
+remove_apple_litter: true
+
+# AI CLI rolling backups: keep this many newest, remove the older surplus.
+keep_backups: 2
+
+# AI CLI transcripts / file-history / logs older than this many days are stale.
+ai_history_max_age_days: 30
+
+# Old-kernel removal (via the package manager, which keeps the running kernel).
+remove_old_kernels: true
+keep_kernels: 2
+
+# Include language "offline repo" caches (Maven ~/.m2, Ivy, sbt, Coursier,
+# NuGet, RubyGems) whose removal forces big re-downloads. Off by default.
+include_offline_repos: false
+
+# Remove editor backup/tilde files (*~, *.orig, *.bak, *.rej). Off by default.
+remove_backup_files: false
+
+# localepurge-style removal of translations for unused languages. Off by default.
+purge_unused_locales: false
+
+# Extra paths/globs that must NEVER be deleted (in addition to the built-in
+# protected paths). Supports ~ and shell-style globs.
+protected_globs: []
+#  - ~/Projects/**
+#  - /data
