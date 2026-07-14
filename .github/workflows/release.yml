@@ -126,7 +126,7 @@ jobs:
     if: needs.check-version.outputs.should_release == 'true'
     environment:
       name: pypi
-      url: https://pypi.org/p/cleanix
+      url: https://pypi.org/p/cleanix-cli
     permissions:
       id-token: write   # Trusted Publishing — no API token needed
 

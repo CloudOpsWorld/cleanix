@@ -1,8 +1,8 @@
-# Cleanix
+# Cleanix CLI
 
-[![CI](https://github.com/CloudOpsWorld/cleanix/actions/workflows/ci.yml/badge.svg)](https://github.com/CloudOpsWorld/cleanix/actions/workflows/ci.yml)
-[![PyPI version](https://img.shields.io/pypi/v/cleanix.svg)](https://pypi.org/project/cleanix/)
-[![Python versions](https://img.shields.io/pypi/pyversions/cleanix.svg)](https://pypi.org/project/cleanix/)
+[![CI](https://github.com/CloudOpsWorld/cleanix-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/CloudOpsWorld/cleanix-cli/actions/workflows/ci.yml)
+[![PyPI version](https://img.shields.io/pypi/v/cleanix-cli.svg)](https://pypi.org/project/cleanix-cli/)
+[![Python versions](https://img.shields.io/pypi/pyversions/cleanix-cli.svg)](https://pypi.org/project/cleanix-cli/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A safe, thorough system cleaner for **every *nix flavour** — Linux (all
@@ -167,13 +167,13 @@ sudo cleanix clean --only memory_macos --execute   # macOS `purge`
 ## Install
 
 ```bash
-pip install cleanix          # from PyPI
+pip install cleanix-cli      # from PyPI
 # or from source:
-cd cleanix && pip install -e .
+cd cleanix-cli && pip install -e .
 ```
 
 This installs the `cleanix` command. Standalone Linux/macOS binaries are also
-attached to each [GitHub Release](https://github.com/CloudOpsWorld/cleanix/releases).
+attached to each [GitHub Release](https://github.com/CloudOpsWorld/cleanix-cli/releases).
 
 ## Usage
 

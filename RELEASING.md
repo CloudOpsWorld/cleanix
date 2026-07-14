@@ -1,4 +1,4 @@
-# Releasing cleanix
+# Releasing cleanix-cli
 
 Publishing is fully automated via GitHub Actions, modeled on a
 push-to-`main`-triggers-release flow.
@@ -33,7 +33,7 @@ No API token required. On PyPI:
 1. Create the project owner/account, then go to **PyPI → Your projects →
    Publishing → Add a new pending publisher** with:
    - Owner: your GitHub org/user
-   - Repository: `cleanix`
+   - Repository: `cleanix-cli`
    - Workflow name: `release.yml`
    - Environment: `pypi`
 2. In the GitHub repo, create an **Environment** named `pypi`

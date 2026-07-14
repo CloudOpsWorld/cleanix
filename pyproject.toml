@@ -3,13 +3,13 @@ requires = ["setuptools>=83.0.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cleanix"
+name = "cleanix-cli"
 version = "1.0.0"
 description = "A safe, thorough scheduled system cleaner for every *nix (Linux, macOS, BSD)."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
-authors = [{ name = "cleanix contributors" }]
+authors = [{ name = "cleanix-cli contributors" }]
 keywords = ["cleaner", "cleanup", "system", "maintenance", "linux", "macos", "bsd", "cache"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -34,9 +34,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/CloudOpsWorld/cleanix"
-Repository = "https://github.com/CloudOpsWorld/cleanix"
-Issues = "https://github.com/CloudOpsWorld/cleanix/issues"
+Homepage = "https://github.com/CloudOpsWorld/cleanix-cli"
+Repository = "https://github.com/CloudOpsWorld/cleanix-cli"
+Issues = "https://github.com/CloudOpsWorld/cleanix-cli/issues"
 
 [project.optional-dependencies]
 dev = ["pytest>=9.1.1", "ruff>=0.15.21", "mypy>=2.3.0", "build>=1.5.1"]
