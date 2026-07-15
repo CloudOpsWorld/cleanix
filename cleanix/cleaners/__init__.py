@@ -30,6 +30,8 @@ from cleanix.cleaners.toolchains import ToolchainVersionCleaner
 from cleanix.cleaners.project_cruft import ProjectCruftCleaner
 from cleanix.cleaners.big_files import BigFileReporter
 from cleanix.cleaners.downloads import DownloadsReporter
+from cleanix.cleaners.browser_profiles import BrowserProfileReporter
+from cleanix.cleaners.duplicates import DuplicateFileReporter
 
 # Logs / crashes
 from cleanix.cleaners.logs import JournalCleaner, RotatedLogCleaner
@@ -259,6 +261,8 @@ ALL_CLEANERS: List[Type[Cleaner]] = [
     ProjectCruftCleaner,
     BigFileReporter,
     DownloadsReporter,
+    BrowserProfileReporter,
+    DuplicateFileReporter,
     # macOS extras
     MacExtraCachesCleaner,
     MacContainerCacheCleaner,

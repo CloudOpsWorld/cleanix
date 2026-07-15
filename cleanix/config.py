@@ -125,6 +125,13 @@ class Config:
     downloads_stale_days: float = 60.0
     downloads_min_size_mb: float = 50.0
 
+    # Report-only: non-default browser profiles idle for N+ days (may be orphaned).
+    browser_profile_stale_days: float = 90.0
+
+    # Report-only duplicate finder: compare files >= M MiB, report top N groups.
+    dup_min_size_mb: float = 10.0
+    dup_top_n: int = 50
+
     @classmethod
     def load(cls, path: str | os.PathLike | None = None) -> "Config":
         """Load config, layering a YAML file over the defaults if present."""
@@ -180,6 +187,9 @@ FIELD_HELP = {
     "big_files_top_n": "Report at most the N largest files (largest first)",
     "downloads_stale_days": "Flag ~/Downloads items older than N days (report only)",
     "downloads_min_size_mb": "Only flag ~/Downloads items at least N MiB",
+    "browser_profile_stale_days": "Report browser profiles idle N+ days (report only)",
+    "dup_min_size_mb": "Only compare files in $HOME at least this large (MiB)",
+    "dup_top_n": "Report at most the N largest duplicate groups",
 }
 
 

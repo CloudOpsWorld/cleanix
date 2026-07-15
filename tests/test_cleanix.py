@@ -661,6 +661,73 @@ def test_project_cruft_reports_stale_only(tmp_path, monkeypatch):
     assert all(i.report_only for i in items)
 
 
+def test_duplicates_reported_as_group(tmp_path, monkeypatch):
+    import os as _os
+    import time as _time
+    from cleanix.cleaners import duplicates
+
+    monkeypatch.setattr(duplicates, "home", lambda: tmp_path)
+    old = _time.time() - 3600
+    blob = b"X" * (12 * 1024 * 1024)
+    for name in ("a.iso", "b.iso"):
+        (tmp_path / name).write_bytes(blob)
+        _os.utime(tmp_path / name, (old, old))
+    items = list(duplicates.DuplicateFileReporter(Config()).find_items())
+    assert len(items) == 1 and items[0].report_only
+    assert human_size(12 * 1024 * 1024) in items[0].description
+
+
+def test_duplicates_ignores_unique_small_and_symlinks(tmp_path, monkeypatch):
+    import os as _os
+    import time as _time
+    from cleanix.cleaners import duplicates
+
+    monkeypatch.setattr(duplicates, "home", lambda: tmp_path)
+    old = _time.time() - 3600
+    (tmp_path / "u1.bin").write_bytes(b"A" * (12 * 1024 * 1024))
+    (tmp_path / "u2.bin").write_bytes(b"B" * (12 * 1024 * 1024))  # same size, diff content
+    real = tmp_path / "real.bin"
+    real.write_bytes(b"Z" * (12 * 1024 * 1024))
+    (tmp_path / "link.bin").symlink_to(real)  # symlink, not a real dup
+    for p in (tmp_path / "u1.bin", tmp_path / "u2.bin", real):
+        _os.utime(p, (old, old))
+    assert list(duplicates.DuplicateFileReporter(Config()).find_items()) == []
+
+
+def test_browser_profiles_only_stale_nondefault(tmp_path, monkeypatch):
+    import os as _os
+    import time as _time
+    from cleanix.cleaners import browser_profiles as bp
+
+    def profile(root, name, idle_days):
+        p = root / name
+        p.mkdir(parents=True)
+        (p / "History").write_text("h")
+        (p / "Bookmarks").write_text("b" * 200)
+        if idle_days:
+            old = _time.time() - idle_days * 86400
+            for f in (p, p / "History"):
+                _os.utime(f, (old, old))
+
+    chrome = tmp_path / ".config" / "google-chrome"
+    profile(chrome, "Default", 0)       # active
+    profile(chrome, "Profile 1", 200)   # stale, orphaned
+    profile(chrome, "Profile 2", 0)     # recently used
+    monkeypatch.setattr(bp, "home", lambda: tmp_path)
+    items = list(bp.BrowserProfileReporter(Config()).find_items())
+    prof_items = [i for i in items if "profile" in i.description.lower()]
+    assert len(prof_items) == 1 and "Profile 1" in prof_items[0].description
+    assert all(i.report_only for i in items)
+
+
+def test_dashboard_sparkline():
+    from cleanix.cli import _sparkline
+
+    assert _sparkline([]) == ""
+    assert len(_sparkline([1, 2, 3, 4])) == 4
+    assert _sparkline([0, 0, 0]) == "▁▁▁"
+
+
 # ------------------------------------------------------ containerd (nerdctl)
 def test_nerdctl_inherits_docker_itemization(monkeypatch):
     from cleanix.cleaners import containerd, containers

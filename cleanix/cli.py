@@ -777,6 +777,79 @@ def cmd_stats(args: argparse.Namespace, console: Console) -> int:
     return 0
 
 
+def _sparkline(values: List[float]) -> str:
+    bars = "▁▂▃▄▅▆▇█"
+    nums = [v for v in values if v is not None]
+    if not nums:
+        return ""
+    hi = max(nums)
+    if hi <= 0:
+        return bars[0] * len(nums)
+    return "".join(bars[min(len(bars) - 1, int(v / hi * (len(bars) - 1)))]
+                   for v in nums)
+
+
+def cmd_dashboard(args: argparse.Namespace, console: Console) -> int:
+    """A at-a-glance view: lifetime reclaim trend + the last scheduled scan."""
+    from rich.panel import Panel
+    from rich.table import Table
+
+    from cleanix.core import history
+
+    st = history.stats()
+    entries = st["entries"]
+    freed_series = [e.get("freed", 0) for e in entries[-30:]]
+
+    header = (
+        f"[bold]{human_size(st['total_freed'])}[/bold] reclaimed across "
+        f"[bold]{st['runs']}[/bold] run(s), "
+        f"[bold]{st['total_items']}[/bold] item(s).\n"
+    )
+    if freed_series:
+        header += (
+            f"Recent runs: [green]{_sparkline(freed_series)}[/green]  "
+            f"(last: {human_size(freed_series[-1])} on "
+            f"{_fmt_time(st['last_time'])})"
+        )
+    else:
+        header += "[dim]No clean runs recorded yet.[/dim]"
+    console.print(Panel(header, title="Cleanix dashboard", expand=False))
+
+    # The most recent scheduled/read-only scan report, if one exists.
+    from cleanix.core.history import state_dir
+
+    report = state_dir() / "last-scan.json"
+    if report.exists():
+        try:
+            data = json.loads(report.read_text())
+        except (OSError, ValueError):
+            data = None
+        if data:
+            console.print(
+                f"\n[cyan]Last scan[/cyan] ({data.get('generated_at', '?')}): "
+                f"{data.get('cleanable_human', '0 B')} cleanable, "
+                f"{data.get('report_only_human', '0 B')} to review."
+            )
+            cleaners = sorted(
+                (c for c in data.get("cleaners", []) if c.get("bytes", 0) > 0),
+                key=lambda c: c.get("bytes", 0), reverse=True,
+            )[:8]
+            if cleaners:
+                table = Table(show_header=True, header_style="dim")
+                table.add_column("Top sources", style="cyan")
+                table.add_column("Reclaimable", justify="right", style="green")
+                for c in cleaners:
+                    table.add_row(c.get("name", c.get("id", "?")),
+                                  c.get("human", human_size(c.get("bytes", 0))))
+                console.print(table)
+    else:
+        console.print(
+            "\n[dim]No scan report yet. Run `cleanix scan --json --output "
+            f"{report}` (the scheduler does this automatically).[/dim]"
+        )
+    return 0
+
+
 def cmd_restore(args: argparse.Namespace, console: Console) -> int:
     from cleanix.core import quarantine
 
@@ -1030,6 +1103,10 @@ def build_parser() -> argparse.ArgumentParser:
     p_info.set_defaults(func=cmd_info)
     p_stats = sub.add_parser("stats", help="show lifetime clean statistics")
     p_stats.set_defaults(func=cmd_stats)
+    p_dash = sub.add_parser(
+        "dashboard", help="reclaim trend + last scan at a glance"
+    )
+    p_dash.set_defaults(func=cmd_dashboard)
 
     # restore / quarantine
     p_restore = sub.add_parser("restore", help="undo a clean from quarantine")
