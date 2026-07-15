@@ -562,6 +562,30 @@ def test_toolchains_fail_safe_when_active_unknown(tmp_path, monkeypatch):
     assert list(toolchains.ToolchainVersionCleaner(Config()).find_items()) == []
 
 
+def test_toolchains_sdkman_asdf_fail_safe_when_active_unknown(tmp_path, monkeypatch):
+    # Regression: sdkman/asdf labels ("sdkman/x", "asdf/y") must also be
+    # skipped when their active version can't be determined — else the active
+    # (possibly older) version could be offered for deletion.
+    from cleanix.cleaners import toolchains
+
+    # sdkman candidate with installed versions but NO `current` symlink.
+    java = tmp_path / ".sdkman" / "candidates" / "java"
+    (java / "11.0.1").mkdir(parents=True)
+    (java / "8.0.1").mkdir()
+    # asdf tool installed but absent from .tool-versions (only python pinned).
+    node = tmp_path / ".asdf" / "installs" / "nodejs"
+    (node / "16.0.0").mkdir(parents=True)
+    (node / "18.0.0").mkdir()
+    (tmp_path / ".tool-versions").write_text("python 3.11.0\n")
+
+    monkeypatch.setattr(toolchains, "home", lambda: tmp_path)
+    cfg = Config()
+    cfg.keep_toolchain_versions = 1
+    offered = {os.path.basename(i.path)
+               for i in toolchains.ToolchainVersionCleaner(cfg).find_items()}
+    assert offered == set()  # both managers skipped entirely
+
+
 def test_toolchains_disabled_by_config(tmp_path, monkeypatch):
     from cleanix.cleaners import toolchains
 

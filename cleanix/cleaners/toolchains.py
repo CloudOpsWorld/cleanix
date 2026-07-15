@@ -134,9 +134,11 @@ class ToolchainVersionCleaner(Cleaner):
             versions = [v for v in versions if v.name != "current"]
             if not versions:
                 continue
-            # Fail safe: if we could not determine the active version for a
-            # manager that clearly has installs, do not offer anything.
-            if not resolved and label in ("pyenv", "rbenv", "rustup", "nvm"):
+            # Fail safe: if we could not determine the active version for this
+            # manager (every one — including per-candidate sdkman and per-tool
+            # asdf entries), do not offer ANY of its versions. Pruning with an
+            # empty protected set could delete the version currently in use.
+            if not resolved:
                 continue
             prunable = [v for v in versions if v.name not in protected]
             for old in surplus_after_keeping(prunable, keep):
